@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Diagnóstico TDAH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css">
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <img src="assets/tdah_icon.png" alt="Logo Teste TDAH">
+                <h1>Teste de Diagnóstico TDAH</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content container">
+        <!-- Tela Inicial -->
+        <section id="intro-screen" class="card">
+            <div class="intro-section">
+                <h2>Avaliação de TDAH para Adultos</h2>
+                <p>Este teste de autoavaliação para Transtorno de Déficit de Atenção e Hiperatividade (TDAH) em adultos é baseado em instrumentos validados cientificamente.</p>
+                <p>Responda às perguntas com sinceridade para obter resultados mais precisos.</p>
+                
+                <div class="disclaimer">
+                    <p><strong>Importante:</strong> Este teste é apenas uma ferramenta de triagem inicial e não substitui uma avaliação clínica completa. O diagnóstico definitivo de TDAH deve ser realizado por um profissional de saúde especializado.</p>
+                </div>
+                
+                <div class="payment-header">
+                    <h3>Valor do teste</h3>
+                    <div class="payment-amount">R$14,99</div>
+                    <p>Pagamento único e seguro via Stripe</p>
+                </div>
+                
+                <button id="start-test-btn" class="btn btn-success">Iniciar Teste</button>
+            </div>
+        </section>
+
+        <!-- Tela de Pagamento -->
+        <section id="payment-screen" class="card" style="display: none;">
+            <div class="payment-section">
+                <div class="payment-header">
+                    <h3>Pagamento</h3>
+                    <p>Para acessar o teste completo, realize o pagamento abaixo:</p>
+                    <div class="payment-amount">R$14,99</div>
+                </div>
+                
+                <form id="payment-form">
+                    <div id="payment-element" class="payment-element">
+                        <!-- Stripe Elements será inserido aqui -->
+                    </div>
+                    <div id="payment-message" class="payment-message"></div>
+                    <button id="submit-payment" class="btn btn-success">Pagar e Continuar</button>
+                </form>
+                
+                <button id="back-to-intro" class="btn btn-secondary" style="margin-top: 20px;">Voltar</button>
+            </div>
+        </section>
+
+        <!-- Tela de Informações Pessoais -->
+        <section id="personal-info-screen" class="card" style="display: none;">
+            <div class="form-section">
+                <h3>Informações Pessoais</h3>
+                <p>Preencha os campos abaixo para começar o teste:</p>
+                
+                <form id="personal-info-form">
+                    <div class="form-group">
+                        <label for="name">Nome (opcional)</label>
+                        <input type="text" id="name" class="form-control" placeholder="Seu nome">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="age">Idade</label>
+                        <input type="number" id="age" class="form-control" placeholder="Sua idade" required min="18" max="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gender">Gênero</label>
+                        <select id="gender" class="form-control" required>
+                            <option value="">Selecione</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="feminino">Feminino</option>
+                            <option value="outro">Outro</option>
+                            <option value="prefiro-nao-dizer">Prefiro não dizer</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="education">Escolaridade</label>
+                        <select id="education" class="form-control" required>
+                            <option value="">Selecione</option>
+                            <option value="fundamental">Ensino Fundamental</option>
+                            <option value="medio">Ensino Médio</option>
+                            <option value="superior-incompleto">Superior Incompleto</option>
+                            <option value="superior-completo">Superior Completo</option>
+                            <option value="pos-graduacao">Pós-graduação</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="previous-diagnosis">Possui diagnóstico prévio de TDAH? (opcional)</label>
+                        <select id="previous-diagnosis" class="form-control">
+                            <option value="">Selecione</option>
+                            <option value="sim">Sim</option>
+                            <option value="nao">Não</option>
+                            <option value="suspeita">Suspeito que sim, mas não tenho diagnóstico</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Continuar para o Teste</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Tela do Questionário Parte A -->
+        <section id="questionnaire-a-screen" class="card" style="display: none;">
+            <div class="form-section">
+                <h3>Parte A: Sintomas Principais</h3>
+                <p>Estas são as perguntas mais significativas para o diagnóstico de TDAH. Responda com sinceridade, considerando como você se sentiu nos últimos 6 meses.</p>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text">Pergunta 1 de 6</div>
+                </div>
+                
+                <form id="questionnaire-a-form">
+                    <div class="question-item" data-question="1">
+                        <div class="question-text">1. Com que frequência você deixa um projeto pela metade depois de já ter feito as partes mais difíceis?</div>
+                        <div class="options-group">
+                            <div class="option-item">
+                                <input type="radio" id="q1-1" name="q1" value="0">
+                                <label for="q1-1">Nunca</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q1-2" name="q1" value="0">
+                                <label for="q1-2">Raramente</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q1-3" name="q1" value="0">
+                                <label for="q1-3">Às vezes</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q1-4" name="q1" value="1">
+                                <label for="q1-4">Frequentemente</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q1-5" name="q1" value="1">
+                                <label for="q1-5">Muito frequentemente</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-item" data-question="2" style="display: none;">
+                        <div class="question-text">2. Com que frequência você tem dificuldade para fazer um trabalho que exige organização?</div>
+                        <div class="options-group">
+                            <div class="option-item">
+                                <input type="radio" id="q2-1" name="q2" value="0">
+                                <label for="q2-1">Nunca</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q2-2" name="q2" value="0">
+                                <label for="q2-2">Raramente</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q2-3" name="q2" value="0">
+                                <label for="q2-3">Às vezes</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q2-4" name="q2" value="1">
+                                <label for="q2-4">Frequentemente</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q2-5" name="q2" value="1">
+                                <label for="q2-5">Muito frequentemente</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-item" data-question="3" style="display: none;">
+                        <div class="question-text">3. Com que frequência você tem dificuldade para lembrar de compromissos ou obrigações?</div>
+                        <div class="options-group">
+                            <div class="option-item">
+                                <input type="radio" id="q3-1" name="q3" value="0">
+                                <label for="q3-1">Nunca</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q3-2" name="q3" value="0">
+                                <label for="q3-2">Raramente</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q3-3" name="q3" value="0">
+                                <label for="q3-3">Às vezes</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q3-4" name="q3" value="1">
+                                <label for="q3-4">Frequentemente</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q3-5" name="q3" value="1">
+                                <label for="q3-5">Muito frequentemente</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-item" data-question="4" style="display: none;">
+                        <div class="question-text">4. Quando você precisa fazer algo que exige muita concentração, com que frequência você evita ou adia o início?</div>
+                        <div class="options-group">
+                            <div class="option-item">
+                                <input type="radio" id="q4-1" name="q4" value="0">
+                                <label for="q4-1">Nunca</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q4-2" name="q4" value="0">
+                                <label for="q4-2">Raramente</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q4-3" name="q4" value="0">
+                                <label for="q4-3">Às vezes</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q4-4" name="q4" value="1">
+                                <label for="q4-4">Frequentemente</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q4-5" name="q4" value="1">
+                                <label for="q4-5">Muito frequentemente</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-item" data-question="5" style="display: none;">
+                        <div class="question-text">5. Com que frequência você fica se mexendo na cadeira ou balançando as mãos ou os pés quando precisa ficar sentado(a) por muito tempo?</div>
+                        <div class="options-group">
+                            <div class="option-item">
+                                <input type="radio" id="q5-1" name="q5" value="0">
+                                <label for="q5-1">Nunca</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q5-2" name="q5" value="0">
+                                <label for="q5-2">Raramente</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q5-3" name="q5" value="0">
+                                <label for="q5-3">Às vezes</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q5-4" name="q5" value="1">
+                                <label for="q5-4">Frequentemente</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q5-5" name="q5" value="1">
+                                <label for="q5-5">Muito frequentemente</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-item" data-question="6" style="display: none;">
+                        <div class="question-text">6. Com que frequência você se sente ativo(a) demais e necessitando fazer coisas, como se estivesse "com um motor ligado"?</div>
+                        <div class="options-group">
+                            <div class="option-item">
+                                <input type="radio" id="q6-1" name="q6" value="0">
+                                <label for="q6-1">Nunca</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q6-2" name="q6" value="0">
+                                <label for="q6-2">Raramente</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q6-3" name="q6" value="0">
+                                <label for="q6-3">Às vezes</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q6-4" name="q6" value="1">
+                                <label for="q6-4">Frequentemente</label>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" id="q6-5" name="q6" value="1">
+                                <label for="q6-5">Muito frequentemente</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="navigation-buttons">
+                        <button type="button" id="prev-question-a" class="btn btn-secondary" style="display: none;">Anterior</button>
+                        <button type="button" id="next-question-a" class="btn btn-success">Próxima</button>
+                        <button type="submit" id="submit-part-a" class="btn btn-success" style="display: none;">Continuar para Parte B</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Tela do Questionário Parte B -->
+        <section id="questionnaire-b-screen" class="card" style="display: none;">
+            <div class="form-section">
+                <h3>Parte B: Sintomas Complementares</h3>
+                <p>Estas perguntas fornecem informações adicionais sobre os sintomas e ajudam a caracterizar melhor o seu perfil.</p>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text">Pergunta 1 de 12</div>
+                </div>
+                
+                <form id="questionnaire-b-form">
+                    <!-- As perguntas serão inseridas dinamicamente via JavaScript -->
+                    
+                    <div class="navigation-buttons">
+                        <button type="button" id="prev-question-b" class="btn btn-secondary" style="display: none;">Anterior</button>
+                        <button type="button" id="next-question-b" class="btn btn-success">Próxima</button>
+                        <button type="submit" id="submit-part-b" class="btn btn-success" style="display: none;">Continuar para Impacto Funcional</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Tela do Questionário Parte C -->
+        <section id="questionnaire-c-screen" class="card" style="display: none;">
+            <div class="form-section">
+                <h3>Parte C: Impacto Funcional</h3>
+                <p>Esta seção avalia o impacto dos sintomas em diferentes áreas da sua vida.</p>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text">Pergunta 1 de 5</div>
+                </div>
+                
+                <form id="questionnaire-c-form">
+                    <!-- As perguntas serão inseridas dinamicamente via JavaScript -->
+                    
+                    <div class="navigation-buttons">
+                        <button type="button" id="prev-question-c" class="btn btn-secondary" style="display: none;">Anterior</button>
+                        <button type="button" id="next-question-c" class="btn btn-success">Próxima</button>
+                        <button type="submit" id="submit-part-c" class="btn btn-success" style="display: none;">Ver Resultados</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Tela de Resultados -->
+        <section id="results-screen" class="card" style="display: none;">
+            <div class="results-section">
+                <div class="results-header">
+                    <h3>Seus Resultados</h3>
+                    <p>Baseado nas suas respostas, aqui está o resultado da sua avaliação:</p>
+                </div>
+                
+                <div class="results-score" id="results-score">0/6</div>
+                
+                <div class="results-interpretation" id="results-interpretation">
+                    <!-- Interpretação será inserida dinamicamente via JavaScript -->
+                </div>
+                
+                <div class="results-disclaimer">
+                    <p><strong>Importante:</strong> Este teste é apenas uma ferramenta de triagem e não substitui uma avaliação clínica completa. O diagnóstico definitivo de TDAH deve ser realizado por um profissional de saúde especializado (psiquiatra, neurologista ou neuropsicólogo).</p>
+                    <p>Os resultados deste teste não constituem diagnóstico médico e não devem ser utilizados para automedicação. Sempre consulte um profissional de saúde antes de iniciar qualquer tratamento.</p>
+                </div>
+                
+                <button id="download-results" class="btn btn-success">Baixar Resultados em PDF</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>© 2025 Teste de Diagnóstico TDAH. Todos os direitos reservados.</p>
+            <p>Este teste é baseado em instrumentos validados cientificamente como o ASRS-18 e o DIVA-5.</p>
+            <div class="footer-links">
+                <a href="#" id="terms-link">Termos de Uso</a>
+                <a href="#" id="privacy-link">Política de Privacidade</a>
+                <a href="#" id="contact-link">Contato</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/script.js"></script>
+</body>
+</html>
